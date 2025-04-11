@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Гамбол Уоттерсон</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(to bottom, #a0e9ff, #e0f7fa);
+      overflow: hidden;
+    }
+    .bubble {
+      animation: float 6s ease-in-out infinite;
+    }
+    @keyframes float {
+      0% { transform: translateY(0); opacity: 0.8; }
+      50% { transform: translateY(-20px); opacity: 1; }
+      100% { transform: translateY(0); opacity: 0.8; }
+    }
+    #darwin {
+      position: absolute;
+      bottom: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      transition: bottom 1s ease;
+    }
+    #game-zone {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .clickable-darwin, .bubble-jump {
+      width: 80px;
+      cursor: pointer;
+      position: absolute;
+      pointer-events: auto;
+    }
+    .runner {
+      position: absolute;
+      bottom: 20px;
+      left: 0;
+      width: 80px;
+      transition: left 0.1s;
+    }
+    .obstacle {
+      position: absolute;
+      bottom: 20px;
+      right: -60px;
+      width: 40px;
+      animation: moveLeft 3s linear infinite;
+    }
+    @keyframes moveLeft {
+      from { right: -60px; }
+      to { right: 100%; }
+    }
+  </style>
+</head>
+<body class="font-sans text-gray-800">
+  <div class="relative h-screen w-full flex items-center justify-center">
+    <!-- Плавающие пузырьки -->
+    <div class="absolute inset-0 -z-10">
+      <div class="absolute left-10 top-20 w-6 h-6 bg-white bg-opacity-40 rounded-full bubble"></div>
+      <div class="absolute left-1/3 top-40 w-4 h-4 bg-white bg-opacity-30 rounded-full bubble"></div>
+      <div class="absolute left-2/3 top-60 w-8 h-8 bg-white bg-opacity-20 rounded-full bubble"></div>
+      <div class="absolute right-20 bottom-20 w-5 h-5 bg-white bg-opacity-50 rounded-full bubble"></div>
+    </div>
+
+    <!-- Карточка персонажа -->
+    <div class="bg-white bg-opacity-80 backdrop-blur-md rounded-2xl shadow-xl p-10 max-w-xl w-full text-center">
+      <img src="https://upload.wikimedia.org/wikipedia/en/0/0c/Gumball_Watterson.png" alt="Гамбол" class="mx-auto w-32 h-auto mb-4">
+      <h1 class="text-3xl font-bold text-blue-700 mb-4">🌀 Гамбол Уоттерсон</h1>
+      <p class="mb-4 text-gray-700">Маленький кот с большим сердцем. Любит приключения, шум, веселье и, конечно же, Дарвина!</p>
+
+      <div class="text-left text-sm">
+        <p><strong>Имя:</strong> Гамбол Тристан Уоттерсон</p>
+        <p><strong>Возраст:</strong> 12 лет</p>
+        <p><strong>Семья:</strong> Николь (мама), Ричард (папа), Анаис (сестра), Дарвин (лучший друг)</p>
+        <p><strong>Черты:</strong> Импульсивный, креативный, безумно весёлый, верный</p>
+      </div>
+
+      <div class="mt-6">
+        <button onclick="chooseGame()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-xl transition duration-300">
+          Играть в игру 🎮
+        </button>
+      </div>
+    </div>
+
+    <!-- Всплывающий Дарвин -->
+    <div id="darwin" class="text-center">
+      <img src="https://upload.wikimedia.org/wikipedia/en/7/7e/Darwin_Watterson.png" alt="Дарвин" class="w-24 mx-auto">
+      <div class="bg-yellow-100 border border-yellow-400 text-yellow-800 rounded px-3 py-2 mt-2 inline-block max-w-xs">
+        <span id="darwin-text">Привет, я Дарвин!</span>
+      </div>
+    </div>
+
+    <!-- Игровая зона -->
+    <div id="game-zone"></div>
+    <div class="absolute bottom-4 left-4 text-sm text-blue-800 font-semibold">Очки: <span id="score">0</span> | Уровень: <span id="level">1</span></div>
+
+    <audio id="pop-sound" src="https://www.myinstants.com/media/sounds/pop.mp3" preload="auto"></audio>
+  </div>
+
+  <script>
+    const darwinPhrases = [
+      "Гамбол, ты опять за своё!",
+      "Ой! Я всплыл!",
+      "Поймай меня, если сможешь!",
+      "Зачем ты нажал?",
+    ];
+
+    function showDarwin() {
+      const darwin = document.getElementById('darwin');
+      const text = document.getElementById('darwin-text');
+      text.textContent = darwinPhrases[Math.floor(Math.random() * darwinPhrases.length)];
+      darwin.style.bottom = '40px';
+      setTimeout(() => darwin.style.bottom = '-100px', 3000);
+    }
+
+    function chooseGame() {
+      const choice = prompt("Выбери игру:\n1 - Поймай Дарвина\n2 - Побег из Эльмора\n3 - Прыжки по пузырям");
+      if (choice === "1") startGame();
+      else if (choice === "2") runRunner();
+      else if (choice === "3") jumpGame();
+    }
+
+    let score = 0;
+    let level = 1;
+    let interval;
+
+    function startGame() {
+      clearGame();
+      showDarwin();
+      score = 0;
+      level = 1;
+      document.getElementById('score').textContent = score;
+      document.getElementById('level').textContent = level;
+      interval = setInterval(spawnGameDarwin, 2000 - level * 150);
+    }
+
+    function spawnGameDarwin() {
+      const zone = document.getElementById('game-zone');
+      const darwin = document.createElement('img');
+      darwin.src = 'https://upload.wikimedia.org/wikipedia/en/7/7e/Darwin_Watterson.png';
+      darwin.className = 'clickable-darwin';
+      darwin.style.top = Math.random() * (window.innerHeight - 100) + 'px';
+      darwin.style.left = Math.random() * (window.innerWidth - 100) + 'px';
+      darwin.onclick = () => {
+        score++;
+        document.getElementById('score').textContent = score;
+        document.getElementById('pop-sound').play();
+        darwin.remove();
+        if (score % 5 === 0) {
+          level++;
+          document.getElementById('level').textContent = level;
+          clearInterval(interval);
+          interval = setInterval(spawnGameDarwin, 2000 - level * 150);
+        }
+      };
+      zone.appendChild(darwin);
+      setTimeout(() => darwin.remove(), 2500);
+    }
+
+    function runRunner() {
+      clearGame();
+      const zone = document.getElementById('game-zone');
+      const player = document.createElement('img');
+      player.src = 'https://upload.wikimedia.org/wikipedia/en/0/0c/Gumball_Watterson.png';
+      player.className = 'runner';
+      zone.appendChild(player);
+
+      function move() {
+        let left = parseInt(player.style.left || 0);
+        left += 10;
+        player.style.left = left + 'px';
+        if (left > window.innerWidth) clearInterval(moveInterval);
+      }
+
+      const moveInterval = setInterval(move, 100);
+
+      const obstacle = document.createElement('div');
+      obstacle.className = 'obstacle bg-red-500 h-12 w-10 rounded';
+      zone.appendChild(obstacle);
+    }
+
+    function jumpGame() {
+      clearGame();
+      const zone = document.getElementById('game-zone');
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble-jump bg-pink-400 rounded-full';
+      bubble.style.width = '60px';
+      bubble.style.height = '60px';
+      bubble.style.top = Math.random() * (window.innerHeight - 100) + 'px';
+      bubble.style.left = Math.random() * (window.innerWidth - 100) + 'px';
+      bubble.onclick = () => {
+        score++;
+        document.getElementById('score').textContent = score;
+        document.getElementById('pop-sound').play();
+        bubble.remove();
+        jumpGame();
+      };
+      zone.appendChild(bubble);
+    }
+
+    function clearGame() {
+      clearInterval(interval);
+      document.getElementById('game-zone').innerHTML = '';
+    }
+  </script>
+</body>
+</html>
