@@ -72,7 +72,7 @@
 
     <!-- Карточка персонажа -->
     <div class="bg-white bg-opacity-80 backdrop-blur-md rounded-2xl shadow-xl p-10 max-w-xl w-full text-center">
-      <img src="Gumball 2.jpg">
+      <img src="https://upload.wikimedia.org/wikipedia/en/0/0c/Gumball_Watterson.png" alt="Гамбол" class="mx-auto h-40">
       <h1 class="text-3xl font-bold text-blue-700 mb-4">🌀 Гамбол Уоттерсон</h1>
       <p class="mb-4 text-gray-700">Маленький кот с большим сердцем. Любит приключения, шум, веселье и, конечно же, Дарвина!</p>
 
@@ -92,7 +92,7 @@
 
     <!-- Всплывающий Дарвин -->
     <div id="darwin" class="text-center">
-      <img src="./Darwin.webp" alt="Дарвин" class="w-24 mx-auto">
+      <img src="https://upload.wikimedia.org/wikipedia/en/7/7e/Darwin_Watterson.png" alt="Дарвин" class="w-24 mx-auto">
       <div class="bg-yellow-100 border border-yellow-400 text-yellow-800 rounded px-3 py-2 mt-2 inline-block max-w-xs">
         <span id="darwin-text">Привет, я Дарвин!</span>
       </div>
@@ -105,7 +105,7 @@
     <audio id="pop-sound" src="https://www.myinstants.com/media/sounds/pop.mp3" preload="auto"></audio>
 
     <!-- Добавляем модальное окно выбора игры -->
-    <div id="game-choice" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+    <div id="game-choice" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div class="bg-white rounded-xl p-6 max-w-sm w-full mx-4">
         <h2 class="text-xl font-bold mb-4 text-center">Выберите игру</h2>
         <div class="space-y-3">
@@ -124,6 +124,12 @@
   </div>
 
   <script>
+    // Ждем, пока страница полностью загрузится
+    document.addEventListener('DOMContentLoaded', function() {
+      // Проверка, что все изображения загружены
+      console.log("Страница загружена");
+    });
+
     const darwinPhrases = [
       "Гамбол, ты опять за своё!",
       "Ой! Я всплыл!",
