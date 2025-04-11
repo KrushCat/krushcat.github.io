@@ -103,6 +103,24 @@
     <div class="absolute bottom-4 left-4 text-sm text-blue-800 font-semibold">Очки: <span id="score">0</span> | Уровень: <span id="level">1</span></div>
 
     <audio id="pop-sound" src="https://www.myinstants.com/media/sounds/pop.mp3" preload="auto"></audio>
+
+    <!-- Добавляем модальное окно выбора игры -->
+    <div id="game-choice" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+      <div class="bg-white rounded-xl p-6 max-w-sm w-full mx-4">
+        <h2 class="text-xl font-bold mb-4 text-center">Выберите игру</h2>
+        <div class="space-y-3">
+          <button onclick="startGame(); closeGameChoice()" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-xl transition duration-300">
+            Поймай Дарвина
+          </button>
+          <button onclick="runRunner(); closeGameChoice()" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-xl transition duration-300">
+            Побег из Эльмора
+          </button>
+          <button onclick="jumpGame(); closeGameChoice()" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-4 rounded-xl transition duration-300">
+            Прыжки по пузырям
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -122,10 +140,11 @@
     }
 
     function chooseGame() {
-      const choice = prompt("Выбери игру:\n1 - Поймай Дарвина\n2 - Побег из Эльмора\n3 - Прыжки по пузырям");
-      if (choice === "1") startGame();
-      else if (choice === "2") runRunner();
-      else if (choice === "3") jumpGame();
+      document.getElementById('game-choice').classList.remove('hidden');
+    }
+
+    function closeGameChoice() {
+      document.getElementById('game-choice').classList.add('hidden');
     }
 
     let score = 0;
